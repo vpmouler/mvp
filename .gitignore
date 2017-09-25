@@ -1,5 +1,8 @@
 ### node etc ###
 
+## API keys ##
+Yelp/yelp_api_keys.js
+
 # Logs
 logs
 *.log

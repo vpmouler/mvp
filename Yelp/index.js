@@ -1,0 +1,121 @@
+const express = require('express');
+const app = express();
+const rp = require('request-promise');
+const bodyparser = require('body-parser')
+const Yelp = require('yelp-api-v3');
+// const db = require('./mongo');
+const mongoClient = require('mongodb').MongoClient;
+
+const apiKey = require('./yelp_api_keys');
+
+console.log(apiKey)
+
+const yelp = new Yelp({
+  app_id: apiKey.app_id,
+  app_secret: apiKey.app_secret
+});
+
+app.use('/', express.static('./build'))
+app.use(bodyparser.json());
+
+app.get('/getme', (req, res) => {
+  console.log('inside')
+  // https://github.com/Yelp/yelp-api-v3/blob/master/docs/api-references/businesses-search.md 
+  yelp.search({term: 'vegan', location: '94118', price: '1,2,3', limit: 20})
+    .then(function (data) {
+        res.send(data);
+    })
+    .catch(function (err) {
+        console.error(err);
+  });
+})
+
+
+app.post('/getme', (req, res) => {
+  console.log('this is the POST request')
+  var testDocument = {
+    restaurantName: req.body.data.name,
+    restaurantId: req.body.data.id,
+    restaurantImage: req.body.data.image_url,
+    restaurantRating: req.body.data.rating,
+    restaurantPrice: req.body.data.price,
+    restaurantPhone: req.body.data.display_phone
+  };
+
+
+  var url = 'mongodb://localhost:27017/yelpone';
+  mongoClient.connect(url, function(err, db) {
+    console.log('Connected to MongoDB!');
+    db.createCollection('yelpone', function(err, collection) {
+      console.log('Created collection');
+
+      collection.insert(testDocument, function(err, docs) {
+        console.log('Inserted a document.');
+        collection.count(function(err, count) {
+          console.log('This collection contains ' + count + ' documents.');
+        });
+        collection.find().toArray(function(err, documents) {
+          documents.forEach(function(document) {
+            console.log('Found a document with name = ' + document.name);
+          });
+          db.close();
+          console.log('Closed the connection!');
+        });
+      });
+    });
+  });
+
+  // console.log(favRestObj)
+  // db.save(favRestObj);
+
+  res.send(JSON.stringify({name:'seva'}))
+});
+
+app.get('/refresh', (req, res) => {
+  console.log('in refresh');
+  var url = 'mongodb://localhost:27017/yelpone';
+  mongoClient.connect(url, function(err, db) {
+    db.collection('yelpone', function(err, collection) {
+      // console.log('collection', collection)
+      // console.log(collection.find().stream().on('data',(item));
+
+      console.log(collection.find().toArray((err, items) => {
+        res.send(JSON.stringify(items));
+      }))
+    })
+  })
+  //   console.log('Connected to MongoDB!');
+  //   db.createCollection('yelpone', function(err, collection) {
+  //     console.log('Created collection');
+
+  //     collection.insert(testDocument, function(err, docs) {
+  //       console.log('Inserted a document.');
+  //       collection.count(function(err, count) {
+  //         console.log('This collection contains ' + count + ' documents.');
+  //       });
+  //       collection.find().toArray(function(err, documents) {
+  //         documents.forEach(function(document) {
+  //           console.log('Found a document with name = ' + document.name);
+  //         });
+  //         db.close();
+  //         console.log('Closed the connection!');
+  //       });
+  //     });
+  //   });
+  // });
+  
+});
+
+
+const port = 1337;
+
+app.listen(port, () => {
+  console.log(`Listening on ${port}!`)
+});
+
+// TODO:
+// refactor DB so can just pass in entire req.body
+// why cant use on fetch?
+// make favorite button work correctly
+// refactor to expor to other files on client n sever
+// make a new route for get from client upon component did mount, and use db.find

@@ -147,21 +147,44 @@ const Button = (props) => (
   <button onClick={props.clickedMe}> {props.clickedState ? 'Search' : 'Found One!'}</button>
 )
 
+      // <div className="vid">
+      //   {
+      //     prop.videos.map((vid, i) => 
+      //       <VideoListEntry video={vid} key={i + 1} onClickVideo={prop.onClickVideo}/>
+      //     )
+      //   }
+      // </div>
+
+
 const PreviousFavs = (props) => {
-  // props.previousFavs.businesses.map(restuarant => {
-  //   return (<div> hi </div>)
-  // })
-  console.log('image in prev favs',props.previousFavs.businesses[0].restuarantImage, typeof props.previousFavs.businesses[0].restuarantImage )
   return (
     <div>
       <h2> Previously Favorited Restaurants </h2>
-      <h3> {props.previousFavs.businesses[0].restaurantName} </h3>
-      <span> {props.previousFavs.businesses[0].restaurantRating} </span>
-      <span> {props.previousFavs.businesses[0].restaurantPrice} </span> <br/>
-      <span> {props.previousFavs.businesses[0].restaurantPhone} </span> <br/>
-      <img src={props.previousFavs.businesses[0].restaurantImage} /> <br/>
-    </div> 
+      {
+        props.previousFavs.businesses.map((restuarant, i) => {
+          return (
+            <div key={i}>
+              <h3> {restuarant.restaurantName} </h3>
+              <span> {restuarant.restaurantRating} </span>
+              <span> {restuarant.restaurantPrice} </span> <br/>
+              <span> {restuarant.restaurantPhone} </span> <br/>
+              <img src={restuarant.restaurantImage} /> <br/>
+            </div>
+          )
+        })
+      }
+    </div>
   )
+  // return (
+  //   <div>
+  //     <h2> Previously Favorited Restaurants </h2>
+  //     <h3> {props.previousFavs.businesses[0].restaurantName} </h3>
+  //     <span> {props.previousFavs.businesses[0].restaurantRating} </span>
+  //     <span> {props.previousFavs.businesses[0].restaurantPrice} </span> <br/>
+  //     <span> {props.previousFavs.businesses[0].restaurantPhone} </span> <br/>
+  //     <img src={props.previousFavs.businesses[0].restaurantImage} /> <br/>
+  //   </div> 
+  // )
 }
 
 const YelpRender = (props) => {

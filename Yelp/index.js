@@ -5,6 +5,7 @@ const bodyparser = require('body-parser')
 const Yelp = require('yelp-api-v3');
 // const db = require('./mongo');
 const mongoClient = require('mongodb').MongoClient;
+const querystring = require('querystring');
 
 const apiKey = require('./yelp_api_keys');
 
@@ -15,14 +16,13 @@ const yelp = new Yelp({
   app_secret: apiKey.app_secret
 });
 
-app.use('/start', express.static('./app/pages'))
+app.use('/start', express.static('./app/pages')) // using express as router
 app.use('/', express.static('./build'))
 
 app.use(bodyparser.json());
 
 app.get('/getme', (req, res) => {
-  console.log('inside')
-  // https://github.com/Yelp/yelp-api-v3/blob/master/docs/api-references/businesses-search.md 
+  // https://github.com/Yelp/yelp-api-v3/blob/master/docs/api-references/businesses-search.md
   yelp.search({term: 'vegan', location: '94118', price: '1,2,3', limit: 20})
     .then(function (data) {
         res.send(data);

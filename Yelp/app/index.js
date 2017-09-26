@@ -4,6 +4,12 @@ import {BrowserRouter as Router, Link} from 'react-router-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import {GridList, GridTile} from 'material-ui/GridList';
+import IconButton from 'material-ui/IconButton';
+import StarBorder from 'material-ui/svg-icons/toggle/star-border';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
+
 
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -20,7 +26,10 @@ class App extends React.Component{
       previousFavs: false,
       clickedFind: false,
       clickedSearch: false,
-      firstVisit: true
+      firstVisit: true,
+      finishedZip: false,
+      arrayOfClicked: null,
+      zipcodeEntered: null // ensure this is 5 digits and numeric otherise alert
     };
     this.favoriteRestaurant = this.favoriteRestaurant.bind(this)
   }
@@ -81,12 +90,19 @@ class App extends React.Component{
   }
 
   handleClick() {
+    console.log('i was clicked ajax')
     this.setState({
       clickedFind: true
     });
     $.ajax({
       url: '/getme',
       type: 'GET',
+      data: {test:'sevaIsMe'},
+      contentType: 'application/json',
+      headers: {
+        "My-First-Header":"first value",
+        "My-Second-Header":"second value"
+      },
       success: (data) => {
         this.setState({
           yelpData: JSON.parse(data) // refactor to get random one from server instead of passing along all
@@ -114,8 +130,23 @@ class App extends React.Component{
 
   handleKeyPress(e) {
     if (e.key === 'Enter') {
-      console.log(e.value)
+      this.setState({
+        zipcodeEntered: e.target.value,
+        firstVisit: false
+      })
     }
+  }
+
+  handleAI(arr) {
+    // set state to finished zip true
+    // pass down button
+    console.log('first',arr)
+    this.setState({
+      finishedZip: true,
+      arrayOfClicked: arr
+    });
+    console.log(arr)
+    console.log('in state',this.state.arrayOfClicked)
   }
 
   render() {
@@ -124,6 +155,12 @@ class App extends React.Component{
         <div>
           Hello World First Time!
           <ZipCode handleKeyPress={this.handleKeyPress.bind(this)} />
+        </div>
+      )
+    } else if (!this.state.finishedZip) {
+      return (
+        <div>
+          <GridListExampleSingleLine handleAI={this.handleAI.bind(this)} />
         </div>
       )
     } else if (this.state.previousFavs && !this.state.clickedFind) {
@@ -144,6 +181,7 @@ class App extends React.Component{
           <br />
           <div> We found a restuarant for you! </div>
           <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
+          <CardExampleWithAvatar callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
           <YelpRender callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
         </div>
       )
@@ -161,7 +199,9 @@ class App extends React.Component{
 };
 
 const ZipCode = (props) => (
-  <div>
+  <div style={{
+    margin: `auto`,
+    width: `50%`}}>
     <MuiThemeProvider>
        <TextField
         id="text-field-controlled"
@@ -169,39 +209,112 @@ const ZipCode = (props) => (
         hintText="Enter your zip code to get started!"
       />
     </MuiThemeProvider>
-    <MuiThemeProvider>
-      <RaisedButton label="Go!" onClick={() => alert('boom')}/>
-    </MuiThemeProvider>
+    <br/>
   </div>
-)
+);
 
-
-
-
-
-
-/*
-class TestInput extends React.Component {
-
-handleKeyPress(target) {
-    if(target.charCode==13){
-            alert('Enter clicked!!!');    
-    }
-
-}
-
-render() {
+const CardExampleWithAvatar = (props) => {
+  var randomNum = Math.floor(Math.random() * props.allData.length);
+  var foundBusiness = props.allData[randomNum];
   return (
-    <Input type="text" onKeyPress={this.handleKeyPress} />
-  );
- }
-}
-*/
+    <MuiThemeProvider>
+      <Card>
+        <CardHeader
+          title={foundBusiness.name}
+          subtitle="Here's a recommendation based on your tastes"
+          avatar={foundBusiness.image_url}
+        />
+        <CardMedia
+          overlay={<CardTitle title={foundBusiness.name} subtitle={foundBusiness.rating + ` stars!`} />}
+        >
+          <img src={foundBusiness.image_url} alt="" />
+        </CardMedia>
+        <CardTitle title="The restuarant in a few words" subtitle={foundBusiness.display_phone} />
+        <CardText>
+          Put description of restuarant here {foundBusiness.price}
+        </CardText>
+        <CardActions>
+          <FlatButton label="Favorite this restuarant" onClick={() => props.favoriteRestaurant(foundBusiness)} />
+        </CardActions>
+      </Card>
+    </MuiThemeProvider>
+  )
+};
 
+const GridListExampleSingleLine = (props) => {
+  var arrayOfClicked = [];
+  return (
+    <div>
+      <MuiThemeProvider>
+        <div style={styles.root}>
+          <GridList style={styles.gridList} cols={2.2}>
+            {tilesData.map((tile) => (
+              <GridTile
+                key={tile.img}
+                title={tile.title}
+                actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
+                titleStyle={styles.titleStyle}
+                titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+                onClick={() => arrayOfClicked.push(tile)}
+              >
+                <img src={tile.img} />
+              </GridTile>
+            ))}
+          </GridList>
+        </div>
+      </MuiThemeProvider>
+      <div style={{margin: `auto`}}>
+        <MuiThemeProvider>
+          <RaisedButton label="Next!" onClick={() => props.handleAI(arrayOfClicked)}/>
+        </MuiThemeProvider>
+      </div>
+    </div>
+  )
+};
 
+const styles = {
+  root: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  gridList: {
+    display: 'flex',
+    flexWrap: 'nowrap',
+    overflowX: 'auto',
+  },
+  titleStyle: {
+    color: 'rgb(5, 188, 212)',
+  },
+};
 
-
-
+const tilesData = [
+  {
+    img: 'https://s3-media4.fl.yelpcdn.com/bphoto/ctrC3VYSLnUBqOwihkYmeQ/o.jpg',
+    title: 'Dessert'
+  },
+  {
+    img: 'https://s3-media1.fl.yelpcdn.com/bphoto/8zsuuFU840owv_Nt5qFKwg/o.jpg',
+    title: 'Healthy'
+    // daily helth food center
+  },
+  {
+    img: 'https://s3-media3.fl.yelpcdn.com/bphoto/ose-rlo_a7c6pybjIxjHbA/o.jpg',
+    title: 'Japanese'
+    //Shizen Vegan Sushi Bar & Izakaya
+  },
+  {
+    img: 'https://s3-media2.fl.yelpcdn.com/bphoto/iwutElltXjmQSxySFSJRUQ/o.jpg',
+    title: 'Breakfasty'
+    //oasis cafe
+  },
+  {
+    img: 'https://s3-media1.fl.yelpcdn.com/bphoto/loPhWvr0lmgB1G7lkP2D5Q/o.jpg',
+    title: 'South East Asian',
+    author: 'Hans'
+    // Little Vietnam Cafe
+  }
+];
 
 
 
@@ -216,7 +329,7 @@ render() {
 
 
 const Button = (props) => (
-  <button onClick={props.clickedMe}> {props.clickedState ? 'Search' : 'Found One!'}</button>
+  <button onClick={props.clickedMe}> Search </button>
 );
 
 const PreviousFavs = (props) => {

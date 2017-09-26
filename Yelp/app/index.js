@@ -172,15 +172,15 @@ class App extends React.Component{
       return (
         <div>
           <br />
-          <div> Find A Restaurant! </div>
           <MuiThemeProvider>
             <RaisedButton label="Search For Your Next Adventure!" onClick={this.handleClick.bind(this)}/>
           </MuiThemeProvider>
-          <div> Previously Saved Favorites! </div>
+          <h3> Previously Saved Favorites! </h3>
           <GridListExampleComplex previousFavs={this.state.previousFavs} />
         </div>
       )
     } else if (this.state.yelpData) { // after a user has clicked find a restaurant
+      console.log(this.state.yelpData)
       console.log('inside if')
       return (
         <div>
@@ -466,7 +466,7 @@ const tilesData = [
     title: 'South East Asian'
   },
   {
-    img: 'https://s3-media4.fl.yelpcdn.com/bphoto/UQCitvpwKt7k46Bky648JQ/o.jpg',
+    img: 'https://s3-media2.fl.yelpcdn.com/bphoto/ttfrmolywd0rLpcYJmf7Uw/o.jpg',
     title: 'Gelato',
     author: 'Hans'
     // Little Vietnam Cafe

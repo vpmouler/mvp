@@ -41,8 +41,7 @@ class App extends React.Component{
   // add button to favorite, store that on db
 
   componentDidMount() {
-    console.log(this.state.clickedFind)
-    console.log('componentWillMount')
+    console.log('SET STATE componentDIDMount')
     $.ajax({
       url: '/refresh',
       type: 'GET',
@@ -84,28 +83,34 @@ class App extends React.Component{
   }
 
   handleSearchClick() {
+    console.log('SET STATE HANDLE handleSearchClick')
     this.setState({
       clickedSearch: !this.state.clickedSearch
     })
   }
 
   handleClick() {
-    console.log('i was clicked ajax')
-    this.setState({
-      clickedFind: true
-    });
+    console.log('SET STATE handleClick')
+    console.log('handle click this.state.arrayOfClicked',this.state.arrayOfClicked);
+    console.log('handle click this.state.zipcodeEntered', this.state.zipcodeEntered);
+    var zipcode = '' + this.state.zipcodeEntered;
+    if ( this.state.zipcodeEntered.length !== 5 ) {
+      zipcode = '94102';
+    }
     $.ajax({
       url: '/getme',
       type: 'GET',
-      data: {test:'sevaIsMe'},
+      data: {zipCode:zipcode, preferences:this.state.arrayOfClicked},
       contentType: 'application/json',
       headers: {
         "My-First-Header":"first value",
         "My-Second-Header":"second value"
       },
       success: (data) => {
+
         this.setState({
-          yelpData: JSON.parse(data) // refactor to get random one from server instead of passing along all
+          yelpData: JSON.parse(data), // refactor to get random one from server instead of passing along all
+          clickedFind: true
         })
         console.log('success')
       },
@@ -129,6 +134,7 @@ class App extends React.Component{
   // later can add reviews
 
   handleKeyPress(e) {
+    console.log('SET STATE handleKeyPress')
     if (e.key === 'Enter') {
       this.setState({
         zipcodeEntered: e.target.value,
@@ -138,59 +144,62 @@ class App extends React.Component{
   }
 
   handleAI(arr) {
+    console.log('SET STATE HANDLE AI')
     // set state to finished zip true
     // pass down button
-    console.log('first',arr)
     this.setState({
       finishedZip: true,
       arrayOfClicked: arr
     });
-    console.log(arr)
-    console.log('in state',this.state.arrayOfClicked)
   }
 
   render() {
-    if (this.state.firstVisit) {
+    if (this.state.firstVisit) { // first page, only ZIP
+      console.log('inside first visit')
       return (
         <div>
           <ZipCode handleKeyPress={this.handleKeyPress.bind(this)} />
         </div>
       )
-    } else if (!this.state.finishedZip) {
+    } else if (!this.state.finishedZip) { // row view of preferences (images)
       return (
         <div>
           <GridListExampleSingleLine handleAI={this.handleAI.bind(this)} />
         </div>
       )
-    } else if (this.state.previousFavs && !this.state.clickedFind) {
+    } else if (this.state.previousFavs && !this.state.clickedFind) { // only if user has previoulsy favorited
       console.log('inside prev favs render')
       return (
         <div>
           <br />
           <div> Find A Restaurant! </div>
-          <Button clickedState={this.state.clickedSearch} clickedMe={this.handleClick.bind(this)} /> <br/>
-          <PreviousFavs previousFavs={this.state.previousFavs} />
+          <MuiThemeProvider>
+            <RaisedButton label="Search For Your Next Adventure!" onClick={this.handleClick.bind(this)}/>
+          </MuiThemeProvider>
+          <div> Previously Saved Favorites! </div>
           <GridListExampleComplex previousFavs={this.state.previousFavs} />
-          <div> {this.state.previousFavs ? 'You Have None!' : 'These Are Your Favs!'} </div>
         </div>
       )
-    } else if (this.state.yelpData) {
+    } else if (this.state.yelpData) { // after a user has clicked find a restaurant
       console.log('inside if')
       return (
         <div>
           <br />
           <div> We found a restuarant for you! </div>
-          <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
+          <MuiThemeProvider>
+            <RaisedButton label="Search For Your Next Adventure!" onClick={this.handleClick.bind(this)}/>
+          </MuiThemeProvider>
           <CardExampleWithAvatar callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
         </div>
       )
     } 
-    else {
+    else { // only if user does not have any prevously favorites
+      console.log('inside else')
       return (
         <div>
           <br />
           <div> Find A Restaurant! </div>
-          <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
+          <Button clickedMe={this.handleClick.bind(this)} />
         </div>
       )
     }
@@ -198,7 +207,6 @@ class App extends React.Component{
 };
 
 const GridListExampleComplex = (props) => {
-  console.log('inside gridListconplex ', props)
   return (
     <div style={stylesForGridList.root}>
       <MuiThemeProvider>

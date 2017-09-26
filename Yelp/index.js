@@ -22,8 +22,17 @@ app.use('/', express.static('./build'))
 app.use(bodyparser.json());
 
 app.get('/getme', (req, res) => {
-  // https://github.com/Yelp/yelp-api-v3/blob/master/docs/api-references/businesses-search.md
-  yelp.search({term: 'vegan', location: '94118', price: '1,2,3', limit: 20})
+  console.log(req.query.zipCode)
+  console.log(req.query.preferences)
+  // loop through .preferences, get .title for each and concat to title+title
+  var searchQuery;
+  if (req.query.preferences) {
+    searchQuery = req.query.preferences.reduce((acc, start) => {
+      return start.title+='+'+acc;
+    }, '').slice(0,-1);
+  }
+
+  yelp.search({term: searchQuery || 'icecream', location: req.query.zipCode || '94102', price: '1,2,3', limit: 20})
     .then(function (data) {
         res.send(data);
     })

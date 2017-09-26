@@ -9,7 +9,7 @@ const querystring = require('querystring');
 
 const apiKey = require('./yelp_api_keys');
 
-console.log(apiKey)
+const mongoDB = require('./mongodb');
 
 const yelp = new Yelp({
   app_id: apiKey.app_id,
@@ -88,38 +88,20 @@ app.post('/getme', (req, res) => {
 app.get('/refresh', (req, res) => {
   console.log('in refresh');
   var url = 'mongodb://localhost:27017/yelpone';
+
+  // mongoDB.find(() => res.send()); //try res.json and no stringifiy in mongodb.js
+
   mongoClient.connect(url, function(err, db) {
     db.collection('yelpone', function(err, collection) {
-      // console.log('collection', collection)
-      // console.log(collection.find().stream().on('data',(item));
 
-      console.log(collection.find().toArray((err, items) => {
+      collection.find().toArray((err, items) => {
         res.send(JSON.stringify(items));
-      }))
+      })
     })
   })
-  //   console.log('Connected to MongoDB!');
-  //   db.createCollection('yelpone', function(err, collection) {
-  //     console.log('Created collection');
-
-  //     collection.insert(testDocument, function(err, docs) {
-  //       console.log('Inserted a document.');
-  //       collection.count(function(err, count) {
-  //         console.log('This collection contains ' + count + ' documents.');
-  //       });
-  //       collection.find().toArray(function(err, documents) {
-  //         documents.forEach(function(document) {
-  //           console.log('Found a document with name = ' + document.name);
-  //         });
-  //         db.close();
-  //         console.log('Closed the connection!');
-  //       });
-  //     });
-  //   });
-  // });
-  
 });
 
+ // MODULARIZE AND HOW TO DO $LT
 
 const port = 1337;
 

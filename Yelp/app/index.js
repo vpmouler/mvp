@@ -167,7 +167,7 @@ class App extends React.Component{
           <GridListExampleSingleLine handleAI={this.handleAI.bind(this)} />
         </div>
       )
-    } else if (this.state.previousFavs.businesses.length && !this.state.clickedFind) { // only if user has previoulsy favorited
+    } else if (this.state.previousFavs.businesses && this.state.previousFavs.businesses.length && !this.state.clickedFind) { // only if user has previoulsy favorited
       console.log('inside prev favs render')
       return (
         <div>

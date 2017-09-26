@@ -15,7 +15,9 @@ const yelp = new Yelp({
   app_secret: apiKey.app_secret
 });
 
+app.use('/start', express.static('./app/pages'))
 app.use('/', express.static('./build'))
+
 app.use(bodyparser.json());
 
 app.get('/getme', (req, res) => {
@@ -28,7 +30,9 @@ app.get('/getme', (req, res) => {
     .catch(function (err) {
         console.error(err);
   });
-})
+});
+
+
 
 
 app.post('/getme', (req, res) => {

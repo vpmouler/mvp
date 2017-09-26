@@ -1,9 +1,12 @@
 // import React from 'react'
-// import ReactDOM from 
+// import ReactDOM from
+import {BrowserRouter as Router} from 'react-router-dom'
 
 const React = require('react');
 const ReactDOM = require('react-dom');
 const $ = require('jquery');
+const YelpRender = require('./YelpRender');
+
 
 class App extends React.Component{
   constructor() {
@@ -11,7 +14,9 @@ class App extends React.Component{
     this.state = {
       isToggleOn: true,
       yelpData: null,
-      previousFavs: null
+      previousFavs: false,
+      clickedFind: false,
+      clickedSearch: false
     };
     this.favoriteRestaurant = this.favoriteRestaurant.bind(this)
   }
@@ -23,6 +28,8 @@ class App extends React.Component{
   // add button to favorite, store that on db
 
   componentDidMount() {
+    console.log(this.state.clickedFind)
+    console.log('componentWillMount')
     $.ajax({
       url: '/refresh',
       type: 'GET',
@@ -36,6 +43,10 @@ class App extends React.Component{
         console.log('error in GET Refresh', err);
       }
     })
+  }
+
+  callbackFavorited (e) {
+    console.log('in the callback!',e);  
   }
 
   favoriteRestaurant (restuarant) {
@@ -59,7 +70,16 @@ class App extends React.Component{
     })
   }
 
+  handleSearchClick() {
+    this.setState({
+      clickedSearch: !this.state.clickedSearch
+    })
+  }
+
   handleClick() {
+    this.setState({
+      clickedFind: true
+    });
     $.ajax({
       url: '/getme',
       type: 'GET',
@@ -75,10 +95,6 @@ class App extends React.Component{
     })
   }
 
-  // loop thru get on /refresh w/ .map
-  // these are prev saved restaurants
-  // change prop names so it shows up
-
   // on init show a few restaurants, make super class
   // choose whichu like, ur zip and price range
 
@@ -93,28 +109,15 @@ class App extends React.Component{
   // later can add reviews
 
   render() {
-    // set if this.state.yelpData is true, render something else
-    // use .map?? study regardless, maybe refactor to show all?
-    // if (this.state.getData) {
-    //   console.log('inside getData if');
-    //   return (
-    //     <div>
-    //       <br />
-    //       <div> We found a restuarant for you! </div>
-    //       <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
-    //       <YelpRender favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
-    //     </div>
-    //   )
-    // } 
-
-    if (this.state.previousFavs) {
+    if (this.state.previousFavs && !this.state.clickedFind) {
       console.log('inside prev favs render')
       return (
         <div>
           <br />
-          <div> These are your previoulsy favorited restaurants </div>
-          <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
+          <div> Find A Restaurant! </div>
+          <Button clickedState={this.state.clickedSearch} clickedMe={this.handleClick.bind(this)} /> <br/>
           <PreviousFavs previousFavs={this.state.previousFavs} />
+          <div> {this.state.previousFavs ? 'You Have None!' : 'These Are Your Favs!'} </div>
         </div>
       )
     }
@@ -125,11 +128,11 @@ class App extends React.Component{
           <br />
           <div> We found a restuarant for you! </div>
           <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
-          <YelpRender favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
+          <YelpRender callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
         </div>
       )
-    } else {
-      console.log('inside else')
+    } 
+    else {
       return (
         <div>
           <br />
@@ -139,22 +142,12 @@ class App extends React.Component{
       )
     }
   }
-
 };
 
 
 const Button = (props) => (
   <button onClick={props.clickedMe}> {props.clickedState ? 'Search' : 'Found One!'}</button>
-)
-
-      // <div className="vid">
-      //   {
-      //     prop.videos.map((vid, i) => 
-      //       <VideoListEntry video={vid} key={i + 1} onClickVideo={prop.onClickVideo}/>
-      //     )
-      //   }
-      // </div>
-
+);
 
 const PreviousFavs = (props) => {
   return (
@@ -175,33 +168,7 @@ const PreviousFavs = (props) => {
       }
     </div>
   )
-  // return (
-  //   <div>
-  //     <h2> Previously Favorited Restaurants </h2>
-  //     <h3> {props.previousFavs.businesses[0].restaurantName} </h3>
-  //     <span> {props.previousFavs.businesses[0].restaurantRating} </span>
-  //     <span> {props.previousFavs.businesses[0].restaurantPrice} </span> <br/>
-  //     <span> {props.previousFavs.businesses[0].restaurantPhone} </span> <br/>
-  //     <img src={props.previousFavs.businesses[0].restaurantImage} /> <br/>
-  //   </div> 
-  // )
 }
-
-const YelpRender = (props) => {
-  var randomNum = Math.floor(Math.random() * props.allData.length);
-  var foundBusiness = props.allData[randomNum];
-  console.log('image in yelp render',foundBusiness.image_url, typeof foundBusiness.image_url )
-  return (
-    <div>
-      <button onClick={props.favoriteRestaurant(foundBusiness)} > Favorite this restuarant </button> <br/>
-      <h1> {foundBusiness.name} </h1>
-      <span> {foundBusiness.rating} </span> <br/>
-      <span> {foundBusiness.price} </span> <br/>
-      <span> {foundBusiness.display_phone} </span> <br/>
-      <img src={foundBusiness.image_url} /> <br/>
-    </div>
-  )
-};
 
 ReactDOM.render(<App />, document.getElementById('app'))
 

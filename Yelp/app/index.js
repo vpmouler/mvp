@@ -167,7 +167,7 @@ class App extends React.Component{
           <GridListExampleSingleLine handleAI={this.handleAI.bind(this)} />
         </div>
       )
-    } else if (this.state.previousFavs && !this.state.clickedFind) { // only if user has previoulsy favorited
+    } else if (this.state.previousFavs.businesses.length && !this.state.clickedFind) { // only if user has previoulsy favorited
       console.log('inside prev favs render')
       return (
         <div>
@@ -185,10 +185,12 @@ class App extends React.Component{
       return (
         <div>
           <br />
-          <div> We found a restuarant for you! </div>
-          <MuiThemeProvider>
-            <RaisedButton label="Search For Your Next Adventure!" onClick={this.handleClick.bind(this)}/>
-          </MuiThemeProvider>
+          <div style={stylesForCard.button}>
+            <MuiThemeProvider>
+              <RaisedButton label="Search Next!" onClick={this.handleClick.bind(this)}/>
+            </MuiThemeProvider>
+          <br />
+          </div>
           <CardExampleWithAvatar callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
         </div>
       )
@@ -198,8 +200,9 @@ class App extends React.Component{
       return (
         <div>
           <br />
-          <div> Find A Restaurant! </div>
-          <Button clickedMe={this.handleClick.bind(this)} />
+          <MuiThemeProvider>
+            <RaisedButton label="Find Your Next Adventure" onClick={this.handleClick.bind(this)}/>
+          </MuiThemeProvider>
         </div>
       )
     }
@@ -318,8 +321,9 @@ const previouslyFavoritedGrid = [
 
 const ZipCode = (props) => (
   <div style={{
-    margin: `auto`,
-    width: `50%`}}>
+    marginTop: '200',
+    marginLeft: '500'
+    }}>
     <MuiThemeProvider>
        <TextField
         id="text-field-controlled"
@@ -335,28 +339,55 @@ const CardExampleWithAvatar = (props) => {
   var randomNum = Math.floor(Math.random() * props.allData.length);
   var foundBusiness = props.allData[randomNum];
   return (
-    <MuiThemeProvider>
-      <Card>
-        <CardHeader
-          title={foundBusiness.name}
-          subtitle="Here's a recommendation based on your tastes"
-          avatar={foundBusiness.image_url}
-        />
-        <CardMedia
-          overlay={<CardTitle title={foundBusiness.name} subtitle={foundBusiness.rating + ` stars!`} />}
-        >
-          <img src={foundBusiness.image_url} alt="" />
-        </CardMedia>
-        <CardTitle title="The restuarant in a few words" subtitle={foundBusiness.display_phone} />
-        <CardText>
-          Put description of restuarant here {foundBusiness.price}
-        </CardText>
-        <CardActions>
-          <FlatButton label="Favorite this restuarant" onClick={() => props.favoriteRestaurant(foundBusiness)} />
-        </CardActions>
-      </Card>
-    </MuiThemeProvider>
+    <div style={stylesForCard.div}>
+      <MuiThemeProvider>
+        <Card>
+          <CardHeader
+            title={foundBusiness.name}
+            subtitle="Here's a recommendation based on your tastes"
+            avatar={foundBusiness.image_url}
+          />
+          <CardMedia
+            overlay={<CardTitle title={foundBusiness.name} subtitle={foundBusiness.rating + ` stars!`} />}
+          >
+            <img src={foundBusiness.image_url} alt="" height="50%"/>
+          </CardMedia>
+          <CardTitle title="The restuarant in a few words" subtitle={foundBusiness.display_phone} />
+          <CardText>
+            Put description of restuarant here {foundBusiness.price}
+          </CardText>
+          <CardActions>
+            <FlatButton label="Favorite this restuarant" onClick={() => props.favoriteRestaurant(foundBusiness)} />
+          </CardActions>
+        </Card>
+      </MuiThemeProvider>
+    </div>
   )
+};
+
+const stylesForCard = {
+  // div: {
+  //   width: '100px',
+  //   height: '100px',
+  //   backgroundColor: 'red',
+
+  //   position: 'absolute',
+  //   top:0,
+  //   bottom: 0,
+  //   left: 0,
+  //   right: 0,
+
+  //   margin: 'auto'
+  // }
+  div: {
+    marginLeft: '30%',
+    marginRight: '30%',
+    marginBottom: '50%'
+  },
+  button: {
+    marginLeft: '40%',
+    marginRight: '30%'
+  }
 };
 
 const GridListExampleSingleLine = (props) => {
@@ -398,7 +429,7 @@ const styles = {
   },
   gridList: {
     display: 'flex',
-    flexWrap: 'nowrap',
+    flexWrap: 'wrap',
     overflowX: 'auto',
   },
   titleStyle: {
@@ -428,10 +459,19 @@ const tilesData = [
   },
   {
     img: 'https://s3-media1.fl.yelpcdn.com/bphoto/loPhWvr0lmgB1G7lkP2D5Q/o.jpg',
-    title: 'South East Asian',
+    title: 'South East Asian'
+  },
+  {
+    img: 'https://s3-media1.fl.yelpcdn.com/bphoto/loPhWvr0lmgB1G7lkP2D5Q/o.jpg',
+    title: 'South East Asian'
+  },
+  {
+    img: 'https://s3-media4.fl.yelpcdn.com/bphoto/UQCitvpwKt7k46Bky648JQ/o.jpg',
+    title: 'Gelato',
     author: 'Hans'
     // Little Vietnam Cafe
   }
+
 ];
 
 

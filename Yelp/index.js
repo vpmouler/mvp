@@ -34,6 +34,7 @@ app.get('/getme', (req, res) => {
 
   yelp.search({term: searchQuery || 'icecream', location: req.query.zipCode || '94102', price: '1,2,3', limit: 20})
     .then(function (data) {
+      console.log(data)
         res.send(data);
     })
     .catch(function (err) {

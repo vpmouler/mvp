@@ -1,6 +1,9 @@
 // import React from 'react'
 // import ReactDOM from
-import {BrowserRouter as Router} from 'react-router-dom'
+import {BrowserRouter as Router, Link} from 'react-router-dom';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -16,7 +19,8 @@ class App extends React.Component{
       yelpData: null,
       previousFavs: false,
       clickedFind: false,
-      clickedSearch: false
+      clickedSearch: false,
+      firstVisit: true
     };
     this.favoriteRestaurant = this.favoriteRestaurant.bind(this)
   }
@@ -108,8 +112,21 @@ class App extends React.Component{
 
   // later can add reviews
 
+  handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      console.log(e.value)
+    }
+  }
+
   render() {
-    if (this.state.previousFavs && !this.state.clickedFind) {
+    if (this.state.firstVisit) {
+      return (
+        <div>
+          Hello World First Time!
+          <ZipCode handleKeyPress={this.handleKeyPress.bind(this)} />
+        </div>
+      )
+    } else if (this.state.previousFavs && !this.state.clickedFind) {
       console.log('inside prev favs render')
       return (
         <div>
@@ -120,8 +137,7 @@ class App extends React.Component{
           <div> {this.state.previousFavs ? 'You Have None!' : 'These Are Your Favs!'} </div>
         </div>
       )
-    }
-    else if (this.state.yelpData) {
+    } else if (this.state.yelpData) {
       console.log('inside if')
       return (
         <div>
@@ -143,6 +159,60 @@ class App extends React.Component{
     }
   }
 };
+
+const ZipCode = (props) => (
+  <div>
+    <MuiThemeProvider>
+       <TextField
+        id="text-field-controlled"
+        onKeyPress={props.handleKeyPress}
+        hintText="Enter your zip code to get started!"
+      />
+    </MuiThemeProvider>
+    <MuiThemeProvider>
+      <RaisedButton label="Go!" onClick={() => alert('boom')}/>
+    </MuiThemeProvider>
+  </div>
+)
+
+
+
+
+
+
+/*
+class TestInput extends React.Component {
+
+handleKeyPress(target) {
+    if(target.charCode==13){
+            alert('Enter clicked!!!');    
+    }
+
+}
+
+render() {
+  return (
+    <Input type="text" onKeyPress={this.handleKeyPress} />
+  );
+ }
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const Button = (props) => (

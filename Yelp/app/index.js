@@ -153,7 +153,6 @@ class App extends React.Component{
     if (this.state.firstVisit) {
       return (
         <div>
-          Hello World First Time!
           <ZipCode handleKeyPress={this.handleKeyPress.bind(this)} />
         </div>
       )
@@ -171,6 +170,7 @@ class App extends React.Component{
           <div> Find A Restaurant! </div>
           <Button clickedState={this.state.clickedSearch} clickedMe={this.handleClick.bind(this)} /> <br/>
           <PreviousFavs previousFavs={this.state.previousFavs} />
+          <GridListExampleComplex previousFavs={this.state.previousFavs} />
           <div> {this.state.previousFavs ? 'You Have None!' : 'These Are Your Favs!'} </div>
         </div>
       )
@@ -182,7 +182,6 @@ class App extends React.Component{
           <div> We found a restuarant for you! </div>
           <Button clickedState={this.state.isToggleOn} clickedMe={this.handleClick.bind(this)} />
           <CardExampleWithAvatar callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
-          <YelpRender callbackFav={this.callbackFavorited.bind(this)} favoriteRestaurant={this.favoriteRestaurant} allData={this.state.yelpData.businesses} />
         </div>
       )
     } 
@@ -197,6 +196,117 @@ class App extends React.Component{
     }
   }
 };
+
+const GridListExampleComplex = (props) => {
+  console.log('inside gridListconplex ', props)
+  return (
+    <div style={stylesForGridList.root}>
+      <MuiThemeProvider>
+        <GridList
+          cols={2}
+          cellHeight={200}
+          padding={1}
+          style={stylesForGridList.gridList}
+        >
+          {props.previousFavs.businesses.map((restuarant, i) => (
+            <GridTile
+              key={restuarant.restaurantName}
+              title={restuarant.restaurantName}
+              actionIcon={<IconButton><StarBorder color="white" /></IconButton>}
+              actionPosition="left"
+              titlePosition="top"
+              titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+              cols={2}
+              rows={2}
+            >
+              <img src={restuarant.restaurantImage} />
+            </GridTile>
+          ))}
+        </GridList>
+      </MuiThemeProvider>
+    </div>
+  )
+};
+
+// add featured attribute on prevFaves objects
+const PreviousFavs = (props) => {
+  return (
+    <div>
+      <h2> Previously Favorited Restaurants </h2>
+      {
+        props.previousFavs.businesses.map((restuarant, i) => {
+          return (
+            <div key={i}>
+              <h3> {restuarant.restaurantName} </h3>
+              <span> {restuarant.restaurantRating} </span>
+              <span> {restuarant.restaurantPrice} </span> <br/>
+              <span> {restuarant.restaurantPhone} </span> <br/>
+              <img src={restuarant.restaurantImage} /> <br/>
+            </div>
+          )
+        })
+      }
+    </div>
+  )
+}
+
+const stylesForGridList = {
+  root: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  gridList: {
+    width: 500,
+    height: 450,
+    overflowY: 'auto',
+  },
+};
+
+const previouslyFavoritedGrid = [
+  {
+    img: 'images/grid-list/00-52-29-429_640.jpg',
+    title: 'Breakfast',
+    author: 'jill111',
+    featured: true,
+  },
+  {
+    img: 'images/grid-list/burger-827309_640.jpg',
+    title: 'Tasty burger',
+    author: 'pashminu',
+  },
+  {
+    img: 'images/grid-list/camera-813814_640.jpg',
+    title: 'Camera',
+    author: 'Danson67',
+  },
+  {
+    img: 'images/grid-list/morning-819362_640.jpg',
+    title: 'Morning',
+    author: 'fancycrave1',
+    featured: true,
+  },
+  {
+    img: 'images/grid-list/hats-829509_640.jpg',
+    title: 'Hats',
+    author: 'Hans',
+  },
+  {
+    img: 'images/grid-list/honey-823614_640.jpg',
+    title: 'Honey',
+    author: 'fancycravel',
+  },
+  {
+    img: 'images/grid-list/vegetables-790022_640.jpg',
+    title: 'Vegetables',
+    author: 'jill111',
+  },
+  {
+    img: 'images/grid-list/water-plant-821293_640.jpg',
+    title: 'Water plant',
+    author: 'BkrmadtyaKarki',
+  },
+];
 
 const ZipCode = (props) => (
   <div style={{
@@ -317,41 +427,10 @@ const tilesData = [
 ];
 
 
-
-
-
-
-
-
-
-
-
-
-
 const Button = (props) => (
   <button onClick={props.clickedMe}> Search </button>
 );
 
-const PreviousFavs = (props) => {
-  return (
-    <div>
-      <h2> Previously Favorited Restaurants </h2>
-      {
-        props.previousFavs.businesses.map((restuarant, i) => {
-          return (
-            <div key={i}>
-              <h3> {restuarant.restaurantName} </h3>
-              <span> {restuarant.restaurantRating} </span>
-              <span> {restuarant.restaurantPrice} </span> <br/>
-              <span> {restuarant.restaurantPhone} </span> <br/>
-              <img src={restuarant.restaurantImage} /> <br/>
-            </div>
-          )
-        })
-      }
-    </div>
-  )
-}
 
 ReactDOM.render(<App />, document.getElementById('app'))
 
